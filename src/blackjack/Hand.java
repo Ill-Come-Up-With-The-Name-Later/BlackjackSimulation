@@ -1,4 +1,62 @@
 package blackjack;
 
+import java.util.ArrayList;
+
 public class Hand {
+
+    private final ArrayList<Card> cards;
+
+    public Hand() {
+        this.cards = new ArrayList<>();
+    }
+
+    public ArrayList<Card> getCards() {
+        return cards;
+    }
+
+    public void addCard(Card card) {
+        cards.add(card);
+    }
+
+    /**
+     * The value of the hand
+     *
+     * @return The hand's value
+     */
+    public int value() {
+        int val = 0;
+
+        for(Card card : cards) {
+            switch (card.name()) {
+                case "2", "3", "4", "5", "6", "7", "8", "9", "10":
+                    val += Integer.parseInt(card.name());
+                    break;
+                case "J", "Q", "K":
+                    val += 10;
+                    break;
+                case "A":
+                    if(val <= 10) {
+                        val += 11;
+                    } else {
+                        val += 1;
+                    }
+
+                    break;
+            }
+        }
+
+        return val;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append(String.format("Hand Value: %d | ", value()));
+
+        for(Card card : cards) {
+            str.append(String.format("%s\t", card.toString()));
+        }
+
+        return str + "\n";
+    }
 }
