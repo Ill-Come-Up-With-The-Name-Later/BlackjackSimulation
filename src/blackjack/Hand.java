@@ -56,6 +56,22 @@ public class Hand {
         return val;
     }
 
+    /**
+     * Determines if the hand can be split
+     * <p>
+     * The hand can only be split if the hand has two cards of
+     * equal value
+     *
+     * @return If the hand can be split
+     */
+    public boolean canSplit() {
+        if(cards.size() == 2) {
+            return cards.get(0).valueEqual(cards.get(1));
+        }
+
+        return false;
+    }
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();

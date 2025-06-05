@@ -17,6 +17,31 @@ public class Player {
     }
 
     /**
+     * Splits the hand into two
+     *
+     * @param hand The hand to split
+     */
+    public void splitHand(Hand hand) {
+        if(hand.canSplit()) {
+            Card card1 = hand.getCards().get(0);
+            Card card2 = hand.getCards().get(1);
+
+            Hand hand1 = new Hand();
+            hand1.addCard(card1);
+
+            Hand hand2 = new Hand();
+            hand2.addCard(card2);
+
+            hands.remove(hand);
+
+            hands.add(hand1);
+            hands.add(hand2);
+        } else {
+            System.out.println("Cannot split hand.");
+        }
+    }
+
+    /**
      * Adds a hand
      *
      * @param hand The hand to add

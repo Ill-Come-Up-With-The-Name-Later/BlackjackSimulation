@@ -33,7 +33,7 @@ public class Deck {
             this.addCard(king);
             this.addCard(ace);
         }
-    };
+    }
 
     /**
      * Adds the standard 52 cards to the deck multiple

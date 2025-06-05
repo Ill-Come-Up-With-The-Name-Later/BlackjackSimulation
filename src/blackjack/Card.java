@@ -1,7 +1,6 @@
 package blackjack;
 
 import java.util.Objects;
-import java.util.Random;
 
 public record Card(String name, Suit suit) implements Comparable<Card> {
 
@@ -21,6 +20,23 @@ public record Card(String name, Suit suit) implements Comparable<Card> {
         }
 
         return 1;
+    }
+
+    /**
+     * Determines if this card's value is equal
+     * to another. Method is for determining if a
+     * hand can be split.
+     *
+     * @param other The other card
+     * @return If the other card's value is equal
+     */
+    public boolean valueEqual(Card other) {
+        return switch(other.name) {
+            case "2", "3", "4", "5", "6", "7", "8", "9", "10" -> this.name.equals(other.name());
+            case "J", "Q", "K" -> this.name.equals(other.name()) || this.name.equals("10");
+            case "A" -> this.name.equals("A");
+            default -> false;
+        };
     }
 
     @Override
