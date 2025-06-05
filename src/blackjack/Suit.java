@@ -1,6 +1,7 @@
 package blackjack;
 
 public enum Suit {
+
     HEARTS("❤"),
     CLUBS("♣"),
     SPADES("♠"),

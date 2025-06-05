@@ -3,6 +3,7 @@ package blackjack;
 import java.util.Comparator;
 import java.util.Random;
 
+@Deprecated
 public class CardShuffleComparer implements Comparator<Card> {
 
     /**
@@ -14,6 +15,14 @@ public class CardShuffleComparer implements Comparator<Card> {
      */
     @Override
     public int compare(Card o1, Card o2) {
-        return new Random().nextInt(-1, 2);
+        if(o1.hashCode() < o2.hashCode()) {
+            return -1;
+        }
+
+        if(o1.hashCode() == o2.hashCode()) {
+            return 0;
+        }
+
+        return 1;
     }
 }

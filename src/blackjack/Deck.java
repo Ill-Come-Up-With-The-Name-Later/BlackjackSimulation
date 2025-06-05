@@ -1,18 +1,14 @@
 package blackjack;
 
+import java.util.Random;
 import java.util.Stack;
 
 public class Deck {
 
     public Stack<Card> cards;
 
-    /**
-     * Creates the deck with 52 cards in it
-     */
     public Deck() {
         this.cards = new Stack<>();
-
-        addCards();
     }
 
     /**
@@ -39,6 +35,18 @@ public class Deck {
         }
     };
 
+    /**
+     * Adds the standard 52 cards to the deck multiple
+     * times
+     *
+     * @param decks The number of times to add the cards
+     */
+    public void addCards(int decks) {
+        for(int i = 0; i < decks; i++) {
+            addCards();
+        }
+    }
+
     public void addCard(Card card) {
         this.cards.add(card);
     }
@@ -51,14 +59,48 @@ public class Deck {
      * Shuffles the deck
      */
     public void shuffle() {
-        this.cards.sort(new CardShuffleComparer());
+        int swaps = new Random().nextInt(cards.size() * 2, cards.size() * 5);
+
+        for(int i = 0; i < swaps; i++) {
+            int card1Index = new Random().nextInt(0, cards.size());
+            int card2Index = new Random().nextInt(0, cards.size());
+
+            while(card1Index == card2Index) {
+                card2Index = new Random().nextInt(0, cards.size());
+            }
+
+            Card card1 = cards.get(card1Index);
+            Card card2 = cards.get(card2Index);
+
+            cards.remove(card1);
+            cards.remove(card2);
+
+            cards.insertElementAt(card1, Math.min(cards.size() - 1, Math.max(card2Index, 0)));
+            cards.insertElementAt(card2, Math.min(cards.size() - 1, Math.max(card1Index, 0)));
+        }
     }
 
     public Stack<Card> getCards() {
         return cards;
     }
 
+    /**
+     * Draws a card from the top of the deck
+     *
+     * @return The card at the top of the deck
+     */
     public Card drawCard() {
         return cards.pop();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+
+        for(Card card : cards) {
+            str.append(String.format("%s | ", card.toString()));
+        }
+
+        return str.toString();
     }
 }

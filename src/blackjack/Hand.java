@@ -45,6 +45,14 @@ public class Hand {
             }
         }
 
+        if(val > 21) {
+            for(Card card : cards) {
+                if(card.name().equals("A")) {
+                    val -= 10;
+                }
+            }
+        }
+
         return val;
     }
 
