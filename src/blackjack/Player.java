@@ -5,15 +5,37 @@ import java.util.ArrayList;
 public class Player {
 
     private final ArrayList<Hand> hands;
+    private PlayerStatus status;
+    private String name;
 
-    public Player() {
+    public Player(String name) {
+        this.name = name;
         this.hands = new ArrayList<>();
+        this.status = PlayerStatus.IN;
 
         addHand(new Hand());
     }
 
     public ArrayList<Hand> getHands() {
         return hands;
+    }
+
+    /**
+     * Gets the hand at an index
+     *
+     * @param index The index
+     * @return The hand at index
+     */
+    public Hand getHand(int index) {
+        return this.hands.get(index);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -42,6 +64,24 @@ public class Player {
     }
 
     /**
+     * Takes the first card from a deck
+     *
+     * @param hand The hand to add the card to
+     * @param deck The deck to take the card from
+     */
+    public void hit(Hand hand, Deck deck) {
+        hand.addCard(deck.drawCard());
+        this.setStatus(PlayerStatus.HIT);
+    }
+
+    /**
+     * Stands and ends the turn
+     */
+    public void stand() {
+        this.setStatus(PlayerStatus.STAND);
+    }
+
+    /**
      * Adds a hand
      *
      * @param hand The hand to add
@@ -59,5 +99,61 @@ public class Player {
      */
     public boolean handBust(Hand hand) {
         return hand.value() > 21;
+    }
+
+    /**
+     * True if all hands are bust
+     *
+     * @return If all hands are bust
+     */
+    public boolean bust() {
+        for(Hand hand : this.hands) {
+            if(!this.handBust(hand)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * If the player has not stood or gone bust
+     *
+     * @return If the player is still in the game
+     */
+    public boolean isActive() {
+        return !(this.getStatus() == PlayerStatus.BUST || this.getStatus() == PlayerStatus.STAND);
+    }
+
+    /**
+     * Sets the player's status to BUST
+     */
+    public void setBust() {
+        this.setStatus(PlayerStatus.BUST);
+    }
+
+    public PlayerStatus getStatus() {
+        return status;
+    }
+
+    private void setStatus(PlayerStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * Doubles down. Adds one card to the hand
+     * and then stands
+     *
+     * @param hand The hand to double down
+     * @param deck The deck to draw a card from
+     */
+    public void doubleDown(Hand hand, Deck deck) {
+        this.hit(hand, deck);
+        this.stand();
+    }
+
+    @Override
+    public String toString() {
+        return name + ": " + hands + " | Status: " + status;
     }
 }

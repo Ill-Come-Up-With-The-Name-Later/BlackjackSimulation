@@ -75,12 +75,16 @@ public class Hand {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append(String.format("Hand Value: %d | ", value()));
+        str.append(String.format("Hand Value: %d - ", value()));
 
         for(Card card : cards) {
-            str.append(String.format("%s\t", card.toString()));
+            if(cards.getLast().equals(card)) {
+                str.append(String.format("%s", card.toString()));
+            } else {
+                str.append(String.format("%s | ", card.toString()));
+            }
         }
 
-        return str + "\n";
+        return str.toString();
     }
 }
