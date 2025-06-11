@@ -2,11 +2,55 @@ package blackjack;
 
 import java.util.Objects;
 
-public record Card(String name, Suit suit) implements Comparable<Card> {
+public class Card implements Comparable<Card> {
+
+    private String name;
+    private Suit suit;
+    private boolean show;
+
+    public Card(String name, Suit suit) {
+        this.name = name;
+        this.suit = suit;
+        this.show = true;
+    }
+
+    public Card(String name, Suit suit, boolean show) {
+        this.name = name;
+        this.suit = suit;
+        this.show = show;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Suit getSuit() {
+        return suit;
+    }
+
+    public boolean isShow() {
+        return show;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setShow(boolean show) {
+        this.show = show;
+    }
+
+    public void setSuit(Suit suit) {
+        this.suit = suit;
+    }
 
     @Override
     public String toString() {
-        return String.format("%s%s", name, suit.getSymbol());
+        if(show) {
+            return String.format("%s%s", name, suit.getSymbol());
+        } else {
+            return "?";
+        }
     }
 
     @Override
@@ -32,8 +76,8 @@ public record Card(String name, Suit suit) implements Comparable<Card> {
      */
     public boolean valueEqual(Card other) {
         return switch(other.name) {
-            case "2", "3", "4", "5", "6", "7", "8", "9", "10" -> this.name.equals(other.name());
-            case "J", "Q", "K" -> this.name.equals(other.name()) || this.name.equals("10");
+            case "2", "3", "4", "5", "6", "7", "8", "9", "10" -> this.name.equals(other.getName());
+            case "J", "Q", "K" -> this.name.equals(other.getName()) || this.name.equals("10");
             case "A" -> this.name.equals("A");
             default -> false;
         };
@@ -42,11 +86,11 @@ public record Card(String name, Suit suit) implements Comparable<Card> {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Card card)) return false;
-        return suit() == card.suit() && Objects.equals(name(), card.name());
+        return this.getSuit() == card.getSuit() && Objects.equals(this.getName(), card.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name(), suit());
+        return Objects.hash(this.getName(), this.getSuit());
     }
 }

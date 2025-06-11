@@ -19,14 +19,14 @@ public class Deck {
     public void addCards() {
         for(Suit suit : Suit.values()) {
             for(int i = 2; i <= 10; i++) {
-                Card card = new Card(Integer.toString(i), suit);
+                Card card = new Card(Integer.toString(i), suit, true);
                 this.addCard(card);
             }
 
-            Card jack = new Card("J", suit);
-            Card queen = new Card("Q", suit);
-            Card king = new Card("K", suit);
-            Card ace = new Card("A", suit);
+            Card jack = new Card("J", suit, true);
+            Card queen = new Card("Q", suit, true);
+            Card king = new Card("K", suit, true);
+            Card ace = new Card("A", suit, true);
 
             this.addCard(jack);
             this.addCard(queen);
@@ -91,6 +91,17 @@ public class Deck {
      */
     public Card drawCard() {
         return cards.pop();
+    }
+
+    /**
+     * The number of complete 52 card decks in
+     * this deck
+     *
+     * @return The number of complete 52 card decks in
+     *         this deck
+     */
+    public double numCompleteDecks() {
+        return this.cards.size() / 52.0;
     }
 
     @Override

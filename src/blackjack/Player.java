@@ -7,17 +7,42 @@ public class Player {
     private final ArrayList<Hand> hands;
     private PlayerStatus status;
     private String name;
+    private boolean isDealer;
 
     public Player(String name) {
         this.name = name;
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
+        this.isDealer = false;
 
         addHand(new Hand());
     }
 
+    /**
+     * Deals a card to another player
+     */
+    public void dealCard(Player other, int handIndex, Deck deck, boolean showCard) {
+        Card card = deck.drawCard();
+        card.setShow(showCard);
+
+        other.getHand(handIndex).addCard(card);
+    }
+
+    /**
+     * Gets the player's hands
+     *
+     * @return The player's hands
+     */
     public ArrayList<Hand> getHands() {
         return hands;
+    }
+
+    public boolean isDealer() {
+        return isDealer;
+    }
+
+    public void setDealer(boolean dealer) {
+        isDealer = dealer;
     }
 
     /**
@@ -154,6 +179,12 @@ public class Player {
 
     @Override
     public String toString() {
+        if(isDealer()) {
+            for(Hand hand : hands) {
+                hand.setShowValue(false);
+            }
+        }
+
         return name + ": " + hands + " | Status: " + status;
     }
 }

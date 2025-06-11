@@ -10,12 +10,16 @@ public class Main {
 
         System.out.println(deck);
 
-        Player player = new Player("Test");
-        player.hit(player.getHand(0), deck);
-        player.hit(player.getHand(0), deck);
+        Player dealer = new Player("Dealer");
+        dealer.setDealer(true);
+        dealer.dealCard(dealer, 0, deck, true);
+        dealer.dealCard(dealer, 0, deck, false);
 
-        player.splitHand(player.getHand(0));
+        Player player = new Player("Test Player");
+        dealer.dealCard(player, 0, deck, true);
+        dealer.dealCard(player, 0, deck, true);
 
+        System.out.println(dealer);
         System.out.println(player);
     }
 }
