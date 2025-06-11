@@ -37,6 +37,11 @@ public class GameManager {
             playerMoves(player);
         }
 
+        if(allPlayersBust()) {
+            showDealerCards(dealer);
+            printGameState();
+        }
+
         dealerMoves(dealer);
     }
 
@@ -51,9 +56,14 @@ public class GameManager {
         while(player.isActive()) {
             if(activeHand.value() > 21 && player.getHands().size() == 1) {
                 player.setHandBust(activeHand);
+                System.out.println(player.getName() + " went bust");
                 player.setBust();
-            } else if(activeHand.canSplit() && player.shouldSplitHand(activeHand)) {
-                player.splitHand(activeHand);
+            } else if(activeHand.canSplit()) {
+                if(player.shouldSplitHand(activeHand)) {
+                    player.splitHand(activeHand);
+                } else if(activeHand.value() == 20 && trueCount > 0.33) {
+                    player.splitHand(activeHand);
+                }
             } else if(activeHand.value() < 18) {
                 player.hit(this, activeHand);
             } else {
@@ -62,6 +72,17 @@ public class GameManager {
 
             printGameState();
         }
+    }
+
+    /**
+     * Sets the dealer's cards to show
+     *
+     * @param dealer The dealer
+     */
+    private void showDealerCards(Player dealer) {
+        Hand activeHand = dealer.getHand(0);
+        activeHand.setShowValue(true);
+        activeHand.getCard(1).setShow(true);
     }
 
     /**
@@ -78,6 +99,7 @@ public class GameManager {
         while(dealer.isActive()) {
             if(activeHand.value() > 21) {
                 dealer.setHandBust(activeHand);
+                System.out.println("Dealer went bust");
                 dealer.setBust();
             } else if(activeHand.value() >= 17) {
                 dealer.stand();
@@ -146,6 +168,21 @@ public class GameManager {
     public boolean allPlayersStand() {
         for(Player player : game.getPlayers()) {
             if(player.getStatus() != PlayerStatus.STAND) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * If all players are bust
+     *
+     * @return If all players are bust
+     */
+    public boolean allPlayersBust() {
+        for(Player player : game.getPlayers()) {
+            if(player.getStatus() != PlayerStatus.BUST) {
                 return false;
             }
         }

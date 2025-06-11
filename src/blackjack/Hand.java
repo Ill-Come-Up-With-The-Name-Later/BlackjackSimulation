@@ -76,7 +76,8 @@ public class Hand {
      */
     public boolean canSplit() {
         if(cards.size() == 2) {
-            return cards.get(0).valueEqual(cards.get(1));
+            return cards.get(0).valueEqual(cards.get(1)) &&
+                    cards.get(0).getName().equals(cards.get(1).getName());
         }
 
         return false;
@@ -95,6 +96,8 @@ public class Hand {
         for(Card card : cards) {
             str.append(String.format("%s", card));
         }
+
+        str.append(String.format("Bust: %b", value() > 21));
 
         return str.toString();
     }
