@@ -1,6 +1,7 @@
 package blackjack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Player {
 
@@ -8,24 +9,30 @@ public class Player {
     private PlayerStatus status;
     private String name;
     private boolean isDealer;
+    private final HashMap<Hand, Boolean> handBust;
 
     public Player(String name) {
         this.name = name;
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
         this.isDealer = false;
+        this.handBust = new HashMap<>();
 
-        addHand(new Hand());
+        Hand hand = new Hand();
+        handBust.put(hand, false);
+        addHand(hand);
     }
 
-    /**
-     * Deals a card to another player
-     */
-    public void dealCard(Player other, int handIndex, Deck deck, boolean showCard) {
-        Card card = deck.drawCard();
-        card.setShow(showCard);
+    public Player(String name, boolean isDealer) {
+        this.name = name;
+        this.hands = new ArrayList<>();
+        this.status = PlayerStatus.IN;
+        this.isDealer = isDealer;
+        this.handBust = new HashMap<>();
 
-        other.getHand(handIndex).addCard(card);
+        Hand hand = new Hand();
+        handBust.put(hand, false);
+        addHand(hand);
     }
 
     /**
@@ -69,20 +76,21 @@ public class Player {
      * @param hand The hand to split
      */
     public void splitHand(Hand hand) {
-        if(hand.canSplit()) {
-            Card card1 = hand.getCards().get(0);
-            Card card2 = hand.getCards().get(1);
+        if(isDealer) {
+            return;
+        }
 
-            Hand hand1 = new Hand();
-            hand1.addCard(card1);
+        if(hand.canSplit()) {
+            Card card2 = hand.getCards().get(1);
 
             Hand hand2 = new Hand();
             hand2.addCard(card2);
 
-            hands.remove(hand);
+            hand.getCards().remove(1);
 
-            hands.add(hand1);
             hands.add(hand2);
+
+            this.setStatus(PlayerStatus.SPLIT);
         } else {
             System.out.println("Cannot split hand.");
         }
@@ -91,11 +99,11 @@ public class Player {
     /**
      * Takes the first card from a deck
      *
+     * @param manager The game manager
      * @param hand The hand to add the card to
-     * @param deck The deck to take the card from
      */
-    public void hit(Hand hand, Deck deck) {
-        hand.addCard(deck.drawCard());
+    public void hit(GameManager manager, Hand hand) {
+        manager.dealCard(this, this.hands.indexOf(hand), manager.getDeck(), true);
         this.setStatus(PlayerStatus.HIT);
     }
 
@@ -116,14 +124,22 @@ public class Player {
     }
 
     /**
-     * If a hand is bust. A hand is bust
-     * if its value is greater than 21
+     * Sets the hand to be bust
      *
      * @param hand The hand
-     * @return If a hand is bust
      */
-    public boolean handBust(Hand hand) {
-        return hand.value() > 21;
+    public void setHandBust(Hand hand) {
+        this.handBust.put(hand, true);
+    }
+
+    /**
+     * Determines if a hand is bust
+     *
+     * @param hand A Hand
+     * @return If hand is bust
+     */
+    public boolean isHandBust(Hand hand) {
+        return this.handBust.get(hand);
     }
 
     /**
@@ -131,14 +147,23 @@ public class Player {
      *
      * @return If all hands are bust
      */
-    public boolean bust() {
+    public boolean allHandsBust() {
         for(Hand hand : this.hands) {
-            if(!this.handBust(hand)) {
+            if(!this.isHandBust(hand)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * If the player stands
+     *
+     * @return If the player stands
+     */
+    public boolean isStanding() {
+        return this.status == PlayerStatus.STAND;
     }
 
     /**
@@ -169,22 +194,31 @@ public class Player {
      * Doubles down. Adds one card to the hand
      * and then stands
      *
+     * @param manger The game manager
      * @param hand The hand to double down
-     * @param deck The deck to draw a card from
      */
-    public void doubleDown(Hand hand, Deck deck) {
-        this.hit(hand, deck);
+    public void doubleDown(GameManager manger, Hand hand) {
+        if(isDealer) {
+            return;
+        }
+
+        this.setStatus(PlayerStatus.DOUBLE_DOWN);
+        this.hit(manger, this.getHand(0));
         this.stand();
     }
 
     @Override
     public String toString() {
-        if(isDealer()) {
-            for(Hand hand : hands) {
-                hand.setShowValue(false);
-            }
-        }
-
         return name + ": " + hands + " | Status: " + status;
+    }
+
+    /**
+     * If the player should split a hand
+     *
+     * @param hand The hand
+     * @return If the player should split hand
+     */
+    public boolean shouldSplitHand(Hand hand) {
+        return hand.getCard(0).getName().equals("A") || (hand.getCard(0).value() >= 8 && hand.getCard(0).value() <= 9);
     }
 }

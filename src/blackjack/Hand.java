@@ -34,6 +34,16 @@ public class Hand {
     }
 
     /**
+     * Gets the card at an index
+     *
+     * @param index The index
+     * @return The card at index
+     */
+    public Card getCard(int index) {
+        return cards.get(index);
+    }
+
+    /**
      * The value of the hand
      *
      * @return The hand's value
@@ -42,27 +52,12 @@ public class Hand {
         int val = 0;
 
         for(Card card : cards) {
-            switch (card.getName()) {
-                case "2", "3", "4", "5", "6", "7", "8", "9", "10":
-                    val += Integer.parseInt(card.getName());
-                    break;
-                case "J", "Q", "K":
-                    val += 10;
-                    break;
-                case "A":
-                    if(val <= 10) {
-                        val += 11;
-                    } else {
-                        val += 1;
-                    }
-
-                    break;
-            }
+            val += card.value();
         }
 
         if(val > 21) {
             for(Card card : cards) {
-                if(card.getName().equals("A")) {
+                if(card.getName().equals("A") && val > 21) {
                     val -= 10;
                 }
             }
@@ -90,18 +85,15 @@ public class Hand {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
+
         if(showValue) {
-            str.append(String.format("Hand Value: %d - ", value()));
+            str.append(String.format(" Hand Value: %d - ", value()));
         } else {
-            str.append("Hand - ");
+            str.append(" Hand - ");
         }
 
         for(Card card : cards) {
-            if(cards.getLast().equals(card)) {
-                str.append(String.format("%s", card.toString()));
-            } else {
-                str.append(String.format("%s | ", card.toString()));
-            }
+            str.append(String.format("%s", card));
         }
 
         return str.toString();

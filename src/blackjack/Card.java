@@ -1,7 +1,5 @@
 package blackjack;
 
-import java.util.Objects;
-
 public class Card implements Comparable<Card> {
 
     private String name;
@@ -47,9 +45,9 @@ public class Card implements Comparable<Card> {
     @Override
     public String toString() {
         if(show) {
-            return String.format("%s%s", name, suit.getSymbol());
+            return String.format(" %s%s ", name, suit.getSymbol());
         } else {
-            return "?";
+            return " ? ";
         }
     }
 
@@ -67,6 +65,20 @@ public class Card implements Comparable<Card> {
     }
 
     /**
+     * The card's value
+     *
+     * @return The value of this card
+     */
+    public int value() {
+        return switch(this.getName()) {
+            case "2", "3", "4", "5", "6", "7", "8", "9", "10" -> Integer.parseInt(this.getName());
+            case "J", "Q", "K" -> 10;
+            case "A" -> 11;
+            default -> 0;
+        };
+    }
+
+    /**
      * Determines if this card's value is equal
      * to another. Method is for determining if a
      * hand can be split.
@@ -81,16 +93,5 @@ public class Card implements Comparable<Card> {
             case "A" -> this.name.equals("A");
             default -> false;
         };
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Card card)) return false;
-        return this.getSuit() == card.getSuit() && Objects.equals(this.getName(), card.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.getName(), this.getSuit());
     }
 }

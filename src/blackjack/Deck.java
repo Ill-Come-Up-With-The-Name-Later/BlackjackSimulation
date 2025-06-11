@@ -1,14 +1,14 @@
 package blackjack;
 
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Stack;
 
 public class Deck {
 
-    public Stack<Card> cards;
+    public ArrayList<Card> cards;
 
     public Deck() {
-        this.cards = new Stack<>();
+        this.cards = new ArrayList<>();
     }
 
     /**
@@ -59,7 +59,7 @@ public class Deck {
      * Shuffles the deck
      */
     public void shuffle() {
-        int swaps = new Random().nextInt(cards.size() * 2, cards.size() * 5);
+        int swaps = new Random().nextInt(cards.size() * 5, cards.size() * 10);
 
         for(int i = 0; i < swaps; i++) {
             int card1Index = new Random().nextInt(0, cards.size());
@@ -75,12 +75,12 @@ public class Deck {
             cards.remove(card1);
             cards.remove(card2);
 
-            cards.insertElementAt(card1, Math.min(cards.size() - 1, Math.max(card2Index, 0)));
-            cards.insertElementAt(card2, Math.min(cards.size() - 1, Math.max(card1Index, 0)));
+            cards.add(Math.max(cards.size() - 1, Math.max(card2Index - 1, 0)), card1);
+            cards.add(Math.max(cards.size() - 1, Math.max(card1Index - 1, 0)), card2);
         }
     }
 
-    public Stack<Card> getCards() {
+    public ArrayList<Card> getCards() {
         return cards;
     }
 
@@ -90,7 +90,10 @@ public class Deck {
      * @return The card at the top of the deck
      */
     public Card drawCard() {
-        return cards.pop();
+        Card card = cards.getFirst();
+        cards.removeFirst();
+
+        return card;
     }
 
     /**
@@ -102,6 +105,22 @@ public class Deck {
      */
     public double numCompleteDecks() {
         return this.cards.size() / 52.0;
+    }
+
+    /**
+     * If there are still cards in the deck
+     *
+     * @return If there are still cards in the deck
+     */
+    public boolean hasCards() { return !this.cards.isEmpty(); }
+
+    /**
+     * The number of cards in the deck
+     *
+     * @return The number of cards in the deck
+     */
+    public int size() {
+        return this.cards.size();
     }
 
     @Override
