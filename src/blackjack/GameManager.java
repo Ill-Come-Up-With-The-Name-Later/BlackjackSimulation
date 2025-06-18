@@ -54,23 +54,44 @@ public class GameManager {
         Hand activeHand = player.getHand(0);
 
         while(player.isActive()) {
-            if(activeHand.value() > 21 && player.getHands().size() == 1) {
+            if(activeHand.value() > 21 && player.allHandsBust()) {
                 player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
-            } else if(activeHand.canSplit()) {
+            } else if(activeHand.canSplit() && player.getHands().size() == 1) {
                 if(player.shouldSplitHand(activeHand)) {
                     player.splitHand(activeHand);
-                } else if(activeHand.value() == 20 && trueCount > 0.33) {
-                    player.splitHand(activeHand);
+                } else if(activeHand.value() < 17) {
+                    player.hit(this, activeHand);
+                } else {
+                    player.stand();
                 }
-            } else if(activeHand.value() < 18) {
+            } else if(player.canDoubleDown(activeHand)) {
+                player.doubleDown(this, activeHand);
+            } else if(activeHand.value() < 17) {
                 player.hit(this, activeHand);
             } else {
                 player.stand();
             }
 
+            if(activeHand.value() > 21 && player.allHandsBust()) {
+                player.setHandBust(activeHand);
+                System.out.println(player.getName() + " went bust");
+                player.setBust();
+            }
+
             printGameState();
+
+            if(player.getHands().size() > 1 && player.isStanding()) {
+                if(player.getHands().get(1).value() >= 17) {
+                    player.stand();
+                    printGameState();
+                    break;
+                }
+
+                activeHand = player.getHand(1);
+                player.setIn();
+            }
         }
     }
 
@@ -132,6 +153,7 @@ public class GameManager {
         System.out.println();
         System.out.println("Running Count: " + runningCount);
         System.out.println("True Count: " + trueCount);
+        System.out.println("Cards Remaining: " + deck.size());
     }
 
     /**

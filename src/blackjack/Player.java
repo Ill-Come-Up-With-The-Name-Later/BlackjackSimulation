@@ -10,6 +10,7 @@ public class Player {
     private String name;
     private boolean isDealer;
     private final HashMap<Hand, Boolean> handBust;
+    private final HashMap<Hand, Boolean> handDoubledDown;
 
     public Player(String name) {
         this.name = name;
@@ -17,9 +18,11 @@ public class Player {
         this.status = PlayerStatus.IN;
         this.isDealer = false;
         this.handBust = new HashMap<>();
+        this.handDoubledDown = new HashMap<>();
 
         Hand hand = new Hand();
         handBust.put(hand, false);
+        handDoubledDown.put(hand, false);
         addHand(hand);
     }
 
@@ -29,9 +32,11 @@ public class Player {
         this.status = PlayerStatus.IN;
         this.isDealer = isDealer;
         this.handBust = new HashMap<>();
+        this.handDoubledDown = new HashMap<>();
 
         Hand hand = new Hand();
         handBust.put(hand, false);
+        handDoubledDown.put(hand, false);
         addHand(hand);
     }
 
@@ -86,6 +91,9 @@ public class Player {
             Hand hand2 = new Hand();
             hand2.addCard(card2);
 
+            this.handBust.put(hand2, false);
+            this.handDoubledDown.put(hand2, false);
+
             hand.getCards().remove(1);
 
             hands.add(hand2);
@@ -121,6 +129,8 @@ public class Player {
      */
     public void addHand(Hand hand) {
         this.hands.add(hand);
+        this.handDoubledDown.put(hand, false);
+        this.handBust.put(hand, false);
     }
 
     /**
@@ -204,12 +214,24 @@ public class Player {
 
         this.setStatus(PlayerStatus.DOUBLE_DOWN);
         this.hit(manger, this.getHand(0));
+        this.handDoubledDown.put(hand, true);
         this.stand();
+    }
+
+    /**
+     * Sets the player as in the game
+     */
+    public void setIn() {
+        this.setStatus(PlayerStatus.IN);
+    }
+
+    public boolean canDoubleDown(Hand hand) {
+        return !this.handDoubledDown.get(hand);
     }
 
     @Override
     public String toString() {
-        return name + ": " + hands + " | Status: " + status;
+        return name + ": " + hands;
     }
 
     /**
@@ -219,6 +241,6 @@ public class Player {
      * @return If the player should split hand
      */
     public boolean shouldSplitHand(Hand hand) {
-        return hand.getCard(0).getName().equals("A") || (hand.getCard(0).value() >= 8 && hand.getCard(0).value() <= 9);
+        return hand.getCard(0).getName().equals("A") || (hand.getCard(0).value() >= 8 && hand.getCard(0).value() <= 10);
     }
 }
