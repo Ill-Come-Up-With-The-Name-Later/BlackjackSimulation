@@ -88,7 +88,7 @@ public class Hand {
         StringBuilder str = new StringBuilder();
 
         if(showValue) {
-            str.append(String.format(" Hand Value: %d - ", value()));
+            str.append(String.format("Hand Value: %d - ", value()));
         } else {
             str.append(" Hand - ");
         }

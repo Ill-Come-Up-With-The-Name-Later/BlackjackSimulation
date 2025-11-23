@@ -34,6 +34,11 @@ public class GameManager {
         dealInitialCards(dealer, players);
         printGameState();
 
+        if(dealer.getFirstHand().value() == 21) {
+            determineWinner();
+            return;
+        }
+
         for(Player player : players) {
             playerMoves(player);
         }
@@ -143,19 +148,15 @@ public class GameManager {
      * @param player A player
      */
     private void playerMoves(Player player) {
-        Hand activeHand = player.getHand(0);
+        int index = 0;
+        Hand activeHand = player.getHand(index);
 
         while(player.isActive()) {
-            if(player.getFirstHand().value() >= 18 &&
-                    activeHand.equals(player.getFirstHand())) {
-                player.stand();
-            }
-
             if(activeHand.value() > 21 && player.allHandsBust()) {
                 player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
-            } else if(activeHand.canSplit() && player.getHands().size() == 1) {
+            } else if(activeHand.canSplit()) {
                 if(player.shouldSplitHand(activeHand)) {
                     player.splitHand(activeHand);
                 } else if(activeHand.value() < 17) {
@@ -163,7 +164,7 @@ public class GameManager {
                 } else {
                     player.stand();
                 }
-            } else if(player.canDoubleDown(activeHand)) {
+            } else if(player.canDoubleDown(activeHand) && (activeHand.value() >= 8 && activeHand.value() <= 11)) {
                 player.doubleDown(this, activeHand);
             } else if(activeHand.value() < 17) {
                 player.hit(this, activeHand);
@@ -179,15 +180,12 @@ public class GameManager {
 
             printGameState();
 
-            if(player.getHands().size() > 1 && player.isStanding()) {
-                if(player.getHands().get(1).value() >= 17) {
-                    player.stand();
-                    printGameState();
-                    break;
+            if((player.getHands().size() > 1 && player.getHands().size() < 5) && (player.isStanding() || player.isHandBust(activeHand))) {
+                if(index < player.getHands().size()) {
+                    activeHand = player.getHand(index);
+                    player.setIn();
+                    index++;
                 }
-
-                activeHand = player.getHand(1);
-                player.setIn();
             }
         }
     }

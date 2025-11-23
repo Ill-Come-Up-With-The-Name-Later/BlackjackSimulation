@@ -217,16 +217,16 @@ public class Player {
      * Doubles down. Adds one card to the hand
      * and then stands
      *
-     * @param manger The game manager
+     * @param manager The game manager
      * @param hand The hand to double down
      */
-    public void doubleDown(GameManager manger, Hand hand) {
+    public void doubleDown(GameManager manager, Hand hand) {
         if(isDealer) {
             return;
         }
 
         this.setStatus(PlayerStatus.DOUBLE_DOWN);
-        this.hit(manger, this.getHand(0));
+        this.hit(manager, hand);
         this.handDoubledDown.put(hand, true);
         this.stand();
     }
