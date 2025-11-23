@@ -1,7 +1,7 @@
 package blackjack;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashMap;
 
 public class GameManager {
 
@@ -12,6 +12,8 @@ public class GameManager {
     public double runningCount;
     public double trueCount;
 
+    public Player dealer;
+
     public GameManager(Game game) {
         this.deck = new Deck();
         this.game = game;
@@ -19,13 +21,12 @@ public class GameManager {
         this.runningCount = 0;
         this.trueCount = 0;
 
+        dealer = game.getDealer();
+
         this.deck.addCards(6);
     }
 
     public void runUntilCardsOut() {
-        int stoppingPoint = new Random().nextInt(36, 52);
-
-        Player dealer = game.getDealer();
         ArrayList<Player> players = game.getPlayers();
 
         deck.shuffle();
@@ -40,9 +41,100 @@ public class GameManager {
         if(allPlayersBust()) {
             showDealerCards(dealer);
             printGameState();
+            determineWinner();
+            return;
         }
 
         dealerMoves(dealer);
+        determineWinner();
+    }
+
+    public void determineWinner() {
+        HashMap<Player, ArrayList<Hand>> winners = new HashMap<>();
+        HashMap<Player, ArrayList<Hand>> ties = new HashMap<>();
+        HashMap<Player, ArrayList<Hand>> losers = new HashMap<>();
+
+        printGameState();
+
+        for(Player player : getGame().getPlayers()) {
+            for(Hand hand : player.getHands()) {
+                if((hand.value() > dealer.getFirstHand().value() && !(hand.value() > 21)) || (dealer.allHandsBust() && hand.value() <= 21)) {
+                    if(!winners.containsKey(player)) {
+                        winners.put(player, new ArrayList<>() {
+                            {
+                                add(hand);
+                            }
+                        });
+                    } else {
+                        winners.get(player).add(hand);
+                    }
+                } else if(hand.value() == dealer.getFirstHand().value() && !player.isHandBust(hand)) {
+                    if(!ties.containsKey(player)) {
+                        ties.put(player, new ArrayList<>() {
+                            {
+                                add(hand);
+                            }
+                        });
+                    } else {
+                        ties.get(player).add(hand);
+                    }
+                } else {
+                    if(!losers.containsKey(player)) {
+                        losers.put(player, new ArrayList<>() {
+                            {
+                                add(hand);
+                            }
+                        });
+                    } else {
+                        losers.get(player).add(hand);
+                    }
+                }
+            }
+        }
+
+        if(!winners.isEmpty()) {
+            System.out.println("- Winners -");
+
+            for(Player player : winners.keySet()) {
+                System.out.print(player.getName() + ": ");
+                System.out.println();
+
+                for(Hand hand : winners.get(player)) {
+                    System.out.print("\t- " + hand);
+                    System.out.println();
+                }
+            }
+        }
+
+        if(!ties.isEmpty()) {
+            System.out.println("- Ties -");
+
+            for(Player player : ties.keySet()) {
+                System.out.print(player.getName() + ": ");
+                System.out.println();
+
+                for(Hand hand : ties.get(player)) {
+                    System.out.print("\t- " + hand);
+                    System.out.println();
+                }
+            }
+        }
+
+        if(!losers.isEmpty()) {
+            System.out.println("- Losers -");
+
+            for(Player player : losers.keySet()) {
+                System.out.print(player.getName() + ": ");
+                System.out.println();
+
+                for(Hand hand : losers.get(player)) {
+                    System.out.print("\t- " + hand);
+                    System.out.println();
+                }
+            }
+        }
+
+        game.reset();
     }
 
     /**
@@ -54,6 +146,11 @@ public class GameManager {
         Hand activeHand = player.getHand(0);
 
         while(player.isActive()) {
+            if(player.getFirstHand().value() >= 18 &&
+                    activeHand.equals(player.getFirstHand())) {
+                player.stand();
+            }
+
             if(activeHand.value() > 21 && player.allHandsBust()) {
                 player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
@@ -74,7 +171,7 @@ public class GameManager {
                 player.stand();
             }
 
-            if(activeHand.value() > 21 && player.allHandsBust()) {
+            if(activeHand.value() > 21) {
                 player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();

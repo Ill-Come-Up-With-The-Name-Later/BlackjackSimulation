@@ -34,10 +34,19 @@ public class Player {
         this.handBust = new HashMap<>();
         this.handDoubledDown = new HashMap<>();
 
+        createNewHand();
+    }
+
+    /**
+     * Creates a new hand for the player
+     */
+    public Hand createNewHand() {
         Hand hand = new Hand();
         handBust.put(hand, false);
         handDoubledDown.put(hand, false);
         addHand(hand);
+
+        return hand;
     }
 
     /**
@@ -67,6 +76,15 @@ public class Player {
         return this.hands.get(index);
     }
 
+    /**
+     * Gets the first hand
+     *
+     * @return This player's first hand
+     */
+    public Hand getFirstHand() {
+        return this.getHand(0);
+    }
+
     public String getName() {
         return name;
     }
@@ -88,15 +106,10 @@ public class Player {
         if(hand.canSplit()) {
             Card card2 = hand.getCards().get(1);
 
-            Hand hand2 = new Hand();
+            Hand hand2 = createNewHand();
             hand2.addCard(card2);
 
-            this.handBust.put(hand2, false);
-            this.handDoubledDown.put(hand2, false);
-
             hand.getCards().remove(1);
-
-            hands.add(hand2);
 
             this.setStatus(PlayerStatus.SPLIT);
         } else {
@@ -231,7 +244,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return name + ": " + hands;
+        return name + ": " + hands + " Active: " + isActive();
     }
 
     /**
