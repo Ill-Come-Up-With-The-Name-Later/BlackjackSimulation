@@ -63,7 +63,7 @@ public class GameManager {
 
         for(Player player : getGame().getPlayers()) {
             for(Hand hand : player.getHands()) {
-                if((hand.value() > dealer.getFirstHand().value() && !(hand.isBust())) || (dealer.allHandsBust() && !hand.isBust())) {
+                if((hand.value() > dealer.getFirstHand().value() && !(hand.isBust())) || (game.dealerBust() && !hand.isBust())) {
                     if(!winners.containsKey(player)) {
                         winners.put(player, new ArrayList<>() {
                             {
