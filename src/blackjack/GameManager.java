@@ -35,6 +35,7 @@ public class GameManager {
         printGameState();
 
         if(dealer.getFirstHand().value() == 21) {
+            showDealerCards(dealer);
             determineWinner();
             return;
         }
