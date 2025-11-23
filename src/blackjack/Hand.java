@@ -6,15 +6,19 @@ public class Hand {
 
     private final ArrayList<Card> cards;
     private boolean showValue;
+    private boolean doubledDown;
+    private boolean bust;
 
     public Hand() {
         this.cards = new ArrayList<>();
         this.showValue = true;
+        this.doubledDown = false;
+        this.bust = false;
     }
 
     public Hand(boolean showValue) {
-        this.cards = new ArrayList<>();
-        this.showValue = true;
+        this();
+        this.showValue = showValue;
     }
 
     public ArrayList<Card> getCards() {
@@ -31,6 +35,18 @@ public class Hand {
 
     public void setShowValue(boolean showValue) {
         this.showValue = showValue;
+    }
+
+    public void setDoubledDown(boolean doubledDown) {
+        this.doubledDown = doubledDown;
+    }
+
+    public boolean isDoubledDown() {
+        return doubledDown;
+    }
+
+    public boolean isBust() {
+        return value() > 21;
     }
 
     /**
@@ -97,8 +113,8 @@ public class Hand {
             str.append(String.format("%s", card));
         }
 
-        str.append(String.format("Bust: %b", value() > 21));
-
+        str.append(String.format("Doubled Down: %b |", doubledDown));
+        str.append(String.format(" Bust: %b", value() > 21));
         return str.toString();
     }
 }

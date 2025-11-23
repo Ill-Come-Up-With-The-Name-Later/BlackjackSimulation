@@ -63,7 +63,7 @@ public class GameManager {
 
         for(Player player : getGame().getPlayers()) {
             for(Hand hand : player.getHands()) {
-                if((hand.value() > dealer.getFirstHand().value() && !(hand.value() > 21)) || (dealer.allHandsBust() && hand.value() <= 21)) {
+                if((hand.value() > dealer.getFirstHand().value() && !(hand.isBust())) || (dealer.allHandsBust() && !hand.isBust())) {
                     if(!winners.containsKey(player)) {
                         winners.put(player, new ArrayList<>() {
                             {
@@ -152,8 +152,8 @@ public class GameManager {
         Hand activeHand = player.getHand(index);
 
         while(player.isActive()) {
-            if(activeHand.value() > 21 && player.allHandsBust()) {
-                player.setHandBust(activeHand);
+            if(activeHand.isBust() && player.allHandsBust()) {
+                //player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
             } else if(activeHand.canSplit()) {
@@ -172,15 +172,16 @@ public class GameManager {
                 player.stand();
             }
 
-            if(activeHand.value() > 21) {
-                player.setHandBust(activeHand);
+            if(activeHand.isBust()) {
+                //player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
             }
 
             printGameState();
 
-            if((player.getHands().size() > 1 && player.getHands().size() < 5) && (player.isStanding() || player.isHandBust(activeHand))) {
+            if((player.getHands().size() > 1 && player.getHands().size() < 5)
+                    && (player.isStanding() || player.isHandBust(activeHand))) {
                 if(index < player.getHands().size()) {
                     activeHand = player.getHand(index);
                     player.setIn();
@@ -213,8 +214,8 @@ public class GameManager {
         updateCount(activeHand.getCard(1));
 
         while(dealer.isActive()) {
-            if(activeHand.value() > 21) {
-                dealer.setHandBust(activeHand);
+            if(activeHand.isBust()) {
+                //dealer.setHandBust(activeHand);
                 System.out.println("Dealer went bust");
                 dealer.setBust();
             } else if(activeHand.value() >= 17) {

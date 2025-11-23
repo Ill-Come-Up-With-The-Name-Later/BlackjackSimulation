@@ -9,21 +9,14 @@ public class Player {
     private PlayerStatus status;
     private String name;
     private boolean isDealer;
-    private final HashMap<Hand, Boolean> handBust;
-    private final HashMap<Hand, Boolean> handDoubledDown;
 
     public Player(String name) {
         this.name = name;
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
         this.isDealer = false;
-        this.handBust = new HashMap<>();
-        this.handDoubledDown = new HashMap<>();
 
-        Hand hand = new Hand();
-        handBust.put(hand, false);
-        handDoubledDown.put(hand, false);
-        addHand(hand);
+        createNewHand();
     }
 
     public Player(String name, boolean isDealer) {
@@ -31,8 +24,6 @@ public class Player {
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
         this.isDealer = isDealer;
-        this.handBust = new HashMap<>();
-        this.handDoubledDown = new HashMap<>();
 
         createNewHand();
     }
@@ -42,8 +33,6 @@ public class Player {
      */
     public Hand createNewHand() {
         Hand hand = new Hand();
-        handBust.put(hand, false);
-        handDoubledDown.put(hand, false);
         addHand(hand);
 
         return hand;
@@ -142,17 +131,6 @@ public class Player {
      */
     public void addHand(Hand hand) {
         this.hands.add(hand);
-        this.handDoubledDown.put(hand, false);
-        this.handBust.put(hand, false);
-    }
-
-    /**
-     * Sets the hand to be bust
-     *
-     * @param hand The hand
-     */
-    public void setHandBust(Hand hand) {
-        this.handBust.put(hand, true);
     }
 
     /**
@@ -162,7 +140,7 @@ public class Player {
      * @return If hand is bust
      */
     public boolean isHandBust(Hand hand) {
-        return this.handBust.get(hand);
+        return hand.isBust();
     }
 
     /**
@@ -227,7 +205,7 @@ public class Player {
 
         this.setStatus(PlayerStatus.DOUBLE_DOWN);
         this.hit(manager, hand);
-        this.handDoubledDown.put(hand, true);
+        hand.setDoubledDown(true);
         this.stand();
     }
 
@@ -239,7 +217,7 @@ public class Player {
     }
 
     public boolean canDoubleDown(Hand hand) {
-        return !this.handDoubledDown.get(hand);
+        return hand.isDoubledDown();
     }
 
     @Override
