@@ -71,7 +71,7 @@ public class GameManager {
         dealInitialCards(dealer, players);
         printGameState();
 
-        if(dealer.getFirstHand().value() == 21) {
+        if(dealer.hasBlackjack()) {
             showDealerCards(dealer);
             determineWinner();
             return;
@@ -248,10 +248,12 @@ public class GameManager {
         for(Hand hand : winners) {
             if(hand.getCards().size() == 2) {
                 if(hand.value() == 21 && !(hand.isDoubledDown() || hand.isSplit())) {
-                    Player owner = hand.getOwner();
-                    owner.setMoney(owner.getMoney() + bets.get(hand) + (bets.get(hand) * 1.5));
+                    if(!dealer.hasBlackjack()) {
+                        Player owner = hand.getOwner();
+                        owner.setMoney(owner.getMoney() + bets.get(hand) + (bets.get(hand) * 1.5));
 
-                    continue;
+                        continue;
+                    }
                 }
             }
 
