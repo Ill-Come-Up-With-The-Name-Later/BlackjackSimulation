@@ -47,10 +47,12 @@ public class Game {
     public void reset() {
         dealer.getHands().clear();
         dealer.createNewHand();
+        dealer.setIn();
 
         for(Player player : players) {
             player.getHands().clear();
             player.createNewHand();
+            player.setIn();
         }
     }
 }
