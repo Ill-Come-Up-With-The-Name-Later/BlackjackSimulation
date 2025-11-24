@@ -42,22 +42,31 @@ public class GameManager {
      * Runs the game
      */
     public void runUntilCardsOut() {
-        ArrayList<Player> players = game.getPlayers();
-
         deck.shuffle();
 
         while(deck.size() > CUT_POINT && !game.getPlayers().isEmpty()) {
-            playGame(players);
+            playGame();
         }
     }
 
     /**
-     * Runs the entire game once
-     *
-     * @param players The players in the game
+     * Shuffles the deck and plays the game once.
      */
-    public void playGame(ArrayList<Player> players) {
+    public void playOnce() {
+        deck.shuffle();
+        playGame();
+    }
+
+    /**
+     * Runs the entire game once. Does not shuffle.
+     */
+    public void playGame() {
+        ArrayList<Player> players = getGame().getPlayers();
         placeBets();
+
+        if(game.getPlayers().isEmpty()) {
+            return;
+        }
 
         dealInitialCards(dealer, players);
         printGameState();

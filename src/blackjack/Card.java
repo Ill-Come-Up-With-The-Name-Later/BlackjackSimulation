@@ -79,6 +79,15 @@ public class Card implements Comparable<Card> {
     }
 
     /**
+     * If this card is a face card (J, Q, K)
+     *
+     * @return If this card is a face card
+     */
+    public boolean isFaceCard() {
+        return name.equals("J") || name.equals("K") || name.equals("Q");
+    }
+
+    /**
      * Determines if this card's value is equal
      * to another. Method is for determining if a
      * hand can be split.

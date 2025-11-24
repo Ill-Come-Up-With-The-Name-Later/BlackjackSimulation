@@ -13,6 +13,6 @@ public class Main {
         }
 
         GameManager gameManager = new GameManager(game, 6);
-        gameManager.runUntilCardsOut();
+        gameManager.playOnce();
     }
 }

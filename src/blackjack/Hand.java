@@ -99,6 +99,10 @@ public class Hand {
      */
     public boolean canSplit() {
         if(cards.size() == 2) {
+            if(cards.get(0).isFaceCard()) {
+                return cards.get(1).isFaceCard();
+            }
+
             return cards.get(0).valueEqual(cards.get(1)) &&
                     cards.get(0).getName().equals(cards.get(1).getName());
         }
