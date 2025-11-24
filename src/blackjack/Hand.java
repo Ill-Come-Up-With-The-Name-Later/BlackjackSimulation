@@ -103,6 +103,10 @@ public class Hand {
                 return cards.get(1).isFaceCard();
             }
 
+            if(cards.get(0).getName().equals("A")) {
+                return cards.get(1).getName().equals("A");
+            }
+
             return cards.get(0).valueEqual(cards.get(1)) &&
                     cards.get(0).getName().equals(cards.get(1).getName());
         }
