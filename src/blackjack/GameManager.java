@@ -8,11 +8,15 @@ public class GameManager {
     private final Game game;
     private final Deck deck;
     private final ArrayList<Card> drawnCards;
+    private final HashMap<Hand, Double> bets;
 
     public double runningCount;
     public double trueCount;
 
     public Player dealer;
+
+    private final int MAX_HANDS = 4;
+    private final double MIN_BET = 100.0;
 
     public GameManager(Game game) {
         this.deck = new Deck();
@@ -20,16 +24,29 @@ public class GameManager {
         this.drawnCards = new ArrayList<>();
         this.runningCount = 0;
         this.trueCount = 0;
+        this.bets = new HashMap<>();
 
         dealer = game.getDealer();
 
         this.deck.addCards(6);
     }
 
+    public GameManager(Game game, int decks) {
+        this(game);
+
+        this.deck.addCards(decks);
+    }
+
     public void runUntilCardsOut() {
         ArrayList<Player> players = game.getPlayers();
 
         deck.shuffle();
+
+        playGame(players);
+    }
+
+    public void playGame(ArrayList<Player> players) {
+        placeBets();
 
         dealInitialCards(dealer, players);
         printGameState();
@@ -53,6 +70,34 @@ public class GameManager {
 
         dealerMoves(dealer);
         determineWinner();
+    }
+
+    public void placeBets() {
+        for(Player player : game.getPlayers()) {
+            for(Hand hand : player.getHands()) {
+                setBet(hand, MIN_BET);
+            }
+        }
+    }
+
+    public void setBet(Hand hand, double amount) {
+        Player player = hand.getOwner();
+
+        if(player.getMoney() < amount) {
+            return;
+        }
+
+        if(bets.containsKey(hand)) {
+            double current = bets.get(hand);
+            if(amount > current) {
+                double amountToSubtract = amount - current;
+                player.setMoney(player.getMoney() - amountToSubtract);
+                bets.put(hand, amount);
+            }
+        } else {
+            player.setMoney(player.getMoney() - amount);
+            bets.put(hand, amount);
+        }
     }
 
     public void determineWinner() {
@@ -98,49 +143,78 @@ public class GameManager {
             }
         }
 
+        ArrayList<Hand> winnersList = new ArrayList<>();
+
+        for(ArrayList<Hand> hands : winners.values()) {
+            winnersList.addAll(hands);
+        }
+
+        ArrayList<Hand> tiesList = new ArrayList<>();
+
+        for(ArrayList<Hand> hands : ties.values()) {
+            tiesList.addAll(hands);
+        }
+
+        payOut(winnersList, tiesList);
+
         if(!winners.isEmpty()) {
             System.out.println("- Winners -");
 
-            for(Player player : winners.keySet()) {
-                System.out.print(player.getName() + ": ");
-                System.out.println();
-
-                for(Hand hand : winners.get(player)) {
-                    System.out.print("\t- " + hand);
-                    System.out.println();
-                }
-            }
+            printAllBetsInMap(winners);
         }
 
         if(!ties.isEmpty()) {
             System.out.println("- Ties -");
 
-            for(Player player : ties.keySet()) {
-                System.out.print(player.getName() + ": ");
-                System.out.println();
-
-                for(Hand hand : ties.get(player)) {
-                    System.out.print("\t- " + hand);
-                    System.out.println();
-                }
-            }
+            printAllBetsInMap(ties);
         }
 
         if(!losers.isEmpty()) {
             System.out.println("- Losers -");
 
-            for(Player player : losers.keySet()) {
-                System.out.print(player.getName() + ": ");
-                System.out.println();
-
-                for(Hand hand : losers.get(player)) {
-                    System.out.print("\t- " + hand);
-                    System.out.println();
-                }
-            }
+            printAllBetsInMap(losers);
         }
 
         game.reset();
+    }
+
+    private void printAllBetsInMap(HashMap<Player, ArrayList<Hand>> bets) {
+        for(Player player : bets.keySet()) {
+            System.out.print(player.getName() + " - Balance: $" + String.format("%.2f",
+                    player.getMoney()) +  ": ");
+            System.out.println();
+
+            for(Hand hand : bets.get(player)) {
+                System.out.print("\t- " + hand);
+                System.out.println();
+            }
+        }
+    }
+
+    /**
+     * Pays out the winning hands and refunds ties
+     *
+     * @param winners An ArrayList of winning hands
+     */
+    public void payOut(ArrayList<Hand> winners, ArrayList<Hand> ties) {
+        for(Hand hand : winners) {
+            if(hand.getCards().size() == 2) {
+                if(hand.value() == 21) {
+                    Player owner = hand.getOwner();
+                    owner.setMoney(owner.getMoney() + bets.get(hand) + (bets.get(hand) * 1.5));
+
+                    continue;
+                }
+            }
+
+            Player owner = hand.getOwner();
+            owner.setMoney(owner.getMoney() + (bets.get(hand) * 2));
+        }
+
+        for(Hand hand : ties) {
+            Player owner = hand.getOwner();
+            owner.setMoney(owner.getMoney() + bets.get(hand));
+        }
     }
 
     /**
@@ -154,19 +228,21 @@ public class GameManager {
 
         while(player.isActive()) {
             if(activeHand.isBust() && player.allHandsBust()) {
-                //player.setHandBust(activeHand);
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
             } else if(activeHand.canSplit()) {
                 if(player.shouldSplitHand(activeHand)) {
-                    player.splitHand(activeHand);
+                    Hand split = player.splitHand(activeHand);
+                    setBet(split, bets.get(activeHand));
                 } else if(activeHand.value() < 17) {
                     player.hit(this, activeHand);
                 } else {
                     player.stand();
                 }
-            } else if(player.canDoubleDown(activeHand) && (activeHand.value() >= 8 && activeHand.value() <= 11)) {
+            } else if(player.canDoubleDown(activeHand) && (activeHand.value() >= 9 && activeHand.value() <= 11)) {
                 player.doubleDown(this, activeHand);
+                setBet(activeHand, bets.get(activeHand) * 2);
+                player.stand();
             } else if(activeHand.value() < 17) {
                 player.hit(this, activeHand);
             } else {
@@ -181,7 +257,7 @@ public class GameManager {
 
             printGameState();
 
-            if((player.getHands().size() > 1 && player.getHands().size() < 5)
+            if((player.getHands().size() > 1 && player.getHands().size() < MAX_HANDS + 1)
                     && (player.isStanding() || player.isHandBust(activeHand))) {
                 if(index < player.getHands().size()) {
                     activeHand = player.getHand(index);
@@ -233,6 +309,18 @@ public class GameManager {
      * Prints out the players
      */
     public void printGameState() {
+        System.out.println("============================");
+        System.out.println("Bets");
+
+        for(Player player : game.getPlayers()) {
+            System.out.println(player.getName() + ":");
+
+            for(Hand hand : player.getHands()) {
+                System.out.println("- $" + String.format("%.2f",
+                        bets.get(hand)) + " " + hand);
+            }
+        }
+
         System.out.println("============================");
         System.out.println("Game State");
         System.out.println(game.getDealer());

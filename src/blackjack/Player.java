@@ -9,12 +9,24 @@ public class Player {
     private PlayerStatus status;
     private String name;
     private boolean isDealer;
+    private double money;
 
     public Player(String name) {
         this.name = name;
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
         this.isDealer = false;
+        this.money = 0;
+
+        createNewHand();
+    }
+
+    public Player(String name, double money) {
+        this.name = name;
+        this.hands = new ArrayList<>();
+        this.status = PlayerStatus.IN;
+        this.isDealer = false;
+        this.money = money;
 
         createNewHand();
     }
@@ -24,6 +36,7 @@ public class Player {
         this.hands = new ArrayList<>();
         this.status = PlayerStatus.IN;
         this.isDealer = isDealer;
+        this.money = 0;
 
         createNewHand();
     }
@@ -33,9 +46,18 @@ public class Player {
      */
     public Hand createNewHand() {
         Hand hand = new Hand();
+        hand.setOwner(this);
         addHand(hand);
 
         return hand;
+    }
+
+    public double getMoney() {
+        return money;
+    }
+
+    public void setMoney(double money) {
+        this.money = money;
     }
 
     /**
@@ -86,10 +108,11 @@ public class Player {
      * Splits the hand into two
      *
      * @param hand The hand to split
+     * @return The new hand
      */
-    public void splitHand(Hand hand) {
+    public Hand splitHand(Hand hand) {
         if(isDealer) {
-            return;
+            return null;
         }
 
         if(hand.canSplit()) {
@@ -101,9 +124,12 @@ public class Player {
             hand.getCards().remove(1);
 
             this.setStatus(PlayerStatus.SPLIT);
+            return hand2;
         } else {
             System.out.println("Cannot split hand.");
         }
+
+        return null;
     }
 
     /**
@@ -217,12 +243,22 @@ public class Player {
     }
 
     public boolean canDoubleDown(Hand hand) {
-        return hand.isDoubledDown();
+        return !hand.isDoubledDown();
     }
 
     @Override
     public String toString() {
-        return name + ": " + hands + " Active: " + isActive();
+        StringBuilder builder = new StringBuilder();
+        builder.append(name).append(":");
+
+        if(!isDealer) {
+            builder.append(" Balance: $").append(String.format("%.2f", getMoney()));
+        }
+
+        builder.append(" Hands: ").append(hands.size()).append(" ").append(hands);
+        builder.append(" Active: ").append(isActive());
+
+        return builder.toString();
     }
 
     /**

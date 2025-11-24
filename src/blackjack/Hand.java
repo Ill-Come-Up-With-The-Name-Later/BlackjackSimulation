@@ -7,13 +7,12 @@ public class Hand {
     private final ArrayList<Card> cards;
     private boolean showValue;
     private boolean doubledDown;
-    private boolean bust;
+    private Player owner;
 
     public Hand() {
         this.cards = new ArrayList<>();
         this.showValue = true;
         this.doubledDown = false;
-        this.bust = false;
     }
 
     public Hand(boolean showValue) {
@@ -43,6 +42,14 @@ public class Hand {
 
     public boolean isDoubledDown() {
         return doubledDown;
+    }
+
+    public Player getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        this.owner = owner;
     }
 
     public boolean isBust() {
@@ -113,7 +120,9 @@ public class Hand {
             str.append(String.format("%s", card));
         }
 
-        str.append(String.format("Doubled Down: %b |", doubledDown));
+        if(!owner.isDealer()) {
+            str.append(String.format("Doubled Down: %b |", doubledDown));
+        }
         str.append(String.format(" Bust: %b", value() > 21));
         return str.toString();
     }
