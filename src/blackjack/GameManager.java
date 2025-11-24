@@ -143,7 +143,8 @@ public class GameManager {
 
         for(Player player : getGame().getPlayers()) {
             for(Hand hand : player.getHands()) {
-                if((hand.value() > dealer.getFirstHand().value() && !(hand.isBust())) || (game.dealerBust() && !hand.isBust())) {
+                if((hand.value() > dealer.getFirstHand().value() && !(hand.isBust())) || (game.dealerBust() && !hand.isBust())
+                || (player.hasBlackjack() && !dealer.hasBlackjack())) {
                     if(!winners.containsKey(player)) {
                         winners.put(player, new ArrayList<>() {
                             {
@@ -246,8 +247,8 @@ public class GameManager {
      */
     public void payOut(ArrayList<Hand> winners, ArrayList<Hand> ties) {
         for(Hand hand : winners) {
-            if(hand.getCards().size() == 2) {
-                if(hand.value() == 21 && !(hand.isDoubledDown() || hand.isSplit())) {
+            if(hand.getCards().size() == 2 && hand.getOwner().getHands().size() == 1) {
+                if(hand.getOwner().hasBlackjack() && !(hand.isDoubledDown() || hand.isSplit())) {
                     if(!dealer.hasBlackjack()) {
                         Player owner = hand.getOwner();
                         owner.setMoney(owner.getMoney() + bets.get(hand) + (bets.get(hand) * 1.5));

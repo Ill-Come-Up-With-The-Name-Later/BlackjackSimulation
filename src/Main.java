@@ -8,7 +8,7 @@ public class Main {
         Game game = new Game();
 
         for(int i = 0; i < 7; i++) {
-            Player player = new Player("Player " + (i + 1), 500);
+            Player player = new Player("Player " + (i + 1), 1000);
             game.addPlayer(player);
         }
 
