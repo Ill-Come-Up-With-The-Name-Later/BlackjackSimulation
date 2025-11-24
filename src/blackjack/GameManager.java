@@ -247,7 +247,7 @@ public class GameManager {
     public void payOut(ArrayList<Hand> winners, ArrayList<Hand> ties) {
         for(Hand hand : winners) {
             if(hand.getCards().size() == 2) {
-                if(hand.value() == 21) {
+                if(hand.value() == 21 && !(hand.isDoubledDown() || hand.isSplit())) {
                     Player owner = hand.getOwner();
                     owner.setMoney(owner.getMoney() + bets.get(hand) + (bets.get(hand) * 1.5));
 

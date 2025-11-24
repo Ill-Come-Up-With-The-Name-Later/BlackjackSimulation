@@ -8,11 +8,13 @@ public class Hand {
     private boolean showValue;
     private boolean doubledDown;
     private Player owner;
+    private boolean split;
 
     public Hand() {
         this.cards = new ArrayList<>();
         this.showValue = true;
         this.doubledDown = false;
+        this.split = false;
     }
 
     public Hand(boolean showValue) {
@@ -54,6 +56,14 @@ public class Hand {
 
     public boolean isBust() {
         return value() > 21;
+    }
+
+    public boolean isSplit() {
+        return split;
+    }
+
+    public void setSplit(boolean split) {
+        this.split = split;
     }
 
     /**

@@ -119,8 +119,10 @@ public class Player {
 
             Hand hand2 = createNewHand();
             hand2.addCard(card2);
+            hand.setSplit(true);
 
             hand.getCards().remove(1);
+            hand.setSplit(true);
 
             this.setStatus(PlayerStatus.SPLIT);
             return hand2;
