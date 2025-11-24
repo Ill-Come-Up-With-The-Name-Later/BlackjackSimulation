@@ -1,3 +1,6 @@
 Blackjack simulation:
 
-- Dealer draws until 16 and stands on 17
+- Dealer stands on all 17s
+- Blackjack pays 3:2
+- Resplitting allowed up to 4 hands
+- Double after any split allowed
