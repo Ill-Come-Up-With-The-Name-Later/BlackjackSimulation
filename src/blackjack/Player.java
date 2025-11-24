@@ -281,6 +281,6 @@ public class Player {
     }
 
     public boolean hasBlackjack() {
-        return hasAce() && hasFaceCard() && getFirstHand().getCards().size() == 2;
+        return hasAce() && hasFaceCard() && getFirstHand().getCards().size() == 2 && getHands().size() == 1;
     }
 }
