@@ -15,8 +15,10 @@ public class GameManager {
 
     public Player dealer;
 
+    private final double MIN_BET = 100.00;
+    private final double MAX_INITIAL_BET = 1500.00;
+
     private final int MAX_HANDS = 4;
-    private final double MIN_BET = 100.0;
     private final int CUT_POINT = 52;
 
     public GameManager(Game game) {
@@ -35,7 +37,7 @@ public class GameManager {
     public GameManager(Game game, int decks) {
         this(game);
 
-        this.deck.addCards(decks);
+        this.deck.addCards(decks - 6);
     }
 
     /**
@@ -61,6 +63,10 @@ public class GameManager {
      * Runs the entire game once. Does not shuffle.
      */
     public void playGame() {
+        if(deck.cards.isEmpty()) {
+            return;
+        }
+
         ArrayList<Player> players = getGame().getPlayers();
         placeBets();
 
@@ -81,7 +87,7 @@ public class GameManager {
             playerMoves(player);
         }
 
-        if(allPlayersBust()) {
+        if(allPlayersBust() || allPlayersBlackjack()) {
             showDealerCards(dealer);
             determineWinner();
             return;
@@ -100,7 +106,12 @@ public class GameManager {
 
         for(Player player : game.getPlayers()) {
             for(Hand hand : player.getHands()) {
-                setBet(hand, MIN_BET);
+                if(trueCount >= 1) {
+                    setBet(hand, Math.min(Math.min(MIN_BET * (Math.round(trueCount) + 1),
+                            player.getMoney()), MAX_INITIAL_BET));
+                } else {
+                    setBet(hand, MIN_BET);
+                }
             }
         }
     }
@@ -338,6 +349,7 @@ public class GameManager {
         Hand activeHand = dealer.getHand(0);
         activeHand.setShowValue(true);
         activeHand.getCard(1).setShow(true);
+        updateCount(activeHand.getCard(1));
     }
 
     /**
@@ -348,7 +360,6 @@ public class GameManager {
     private void dealerMoves(Player dealer) {
         Hand activeHand = dealer.getHand(0);
         showDealerCards(dealer);
-        updateCount(activeHand.getCard(1));
 
         while(dealer.isActive()) {
             if(activeHand.isBust()) {
@@ -452,6 +463,16 @@ public class GameManager {
     public boolean allPlayersBust() {
         for(Player player : game.getPlayers()) {
             if(player.getStatus() != PlayerStatus.BUST) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean allPlayersBlackjack() {
+        for(Player player : game.getPlayers()) {
+            if(!player.hasBlackjack()) {
                 return false;
             }
         }
