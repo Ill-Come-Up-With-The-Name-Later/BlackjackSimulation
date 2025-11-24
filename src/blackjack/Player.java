@@ -250,14 +250,19 @@ public class Player {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(name).append(":");
+        builder.append(name).append(": ");
 
         if(!isDealer) {
-            builder.append(" Balance: $").append(String.format("%.2f", getMoney()));
+            builder.append("Balance: $").append(String.format("%.2f", getMoney()));
         }
 
-        builder.append(" Hands: ").append(hands.size()).append(" ").append(hands);
-        builder.append(" Active: ").append(isActive());
+        if(!isDealer) {
+            builder.append(" | Hands: ").append(hands.size()).append(" ");
+        }
+
+        builder.append(hands);
+
+        builder.append(" | Active: ").append(isActive());
 
         return builder.toString();
     }
