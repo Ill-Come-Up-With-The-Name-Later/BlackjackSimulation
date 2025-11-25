@@ -131,6 +131,7 @@ public class GameManager {
 
         if(bets.containsKey(hand)) {
             double current = bets.get(hand);
+
             if(amount > current) {
                 double amountToSubtract = amount - current;
                 player.setMoney(player.getMoney() - amountToSubtract);
@@ -292,40 +293,16 @@ public class GameManager {
             if(activeHand.isBust() && player.allHandsBust()) {
                 System.out.println(player.getName() + " went bust");
                 player.setBust();
-            } else if(activeHand.canSplit()) {
-                if(player.shouldSplitHand(activeHand) && player.getMoney() >= bets.get(activeHand)) {
-                    Hand split = player.splitHand(activeHand);
-                    setBet(split, bets.get(activeHand));
-                } else if(activeHand.value() < 17) {
-                    player.hit(this, activeHand);
-                } else {
-                    player.stand();
-                }
-            } else if(player.canDoubleDown(activeHand)) {
-                if((activeHand.value() >= 9 && activeHand.value() <= 11)
-                        && player.getMoney() >= bets.get(activeHand) * 2) {
-                    player.doubleDown(this, activeHand);
-                    setBet(activeHand, bets.get(activeHand) * 2);
-
-                    player.stand();
-                } else if(activeHand.value() < 17) {
-                    player.hit(this, activeHand);
-                } else {
-                    player.stand();
-                }
-            } else if(activeHand.value() < 17) {
-                player.hit(this, activeHand);
-            } else {
-                player.stand();
+                break;
             }
+
+            basicStrategy(player, activeHand);
 
             if(activeHand.isBust()) {
                 //player.setHandBust(activeHand);
                 System.out.println(player.getName() + "'s hand went bust");
                 player.setBust();
             }
-
-            //printGameState();
 
             if((player.getHands().size() > 1 && player.getHands().size() < MAX_HANDS + 1)
                     && (player.isStanding() || player.isHandBust(activeHand))) {
@@ -338,6 +315,170 @@ public class GameManager {
         }
 
         printGameState();
+    }
+
+    private void basicStrategy(Player player, Hand hand) {
+        Card dealerUpCard = dealer.getFirstHand().getCard(0);
+
+        if(shouldSplitHand(hand, dealerUpCard)) {
+            if(hand.canSplit()) {
+                Hand split = player.splitHand(hand);
+                setBet(split, bets.get(hand));
+            } else if(shouldDoubleDown(hand, dealerUpCard)) {
+                if(player.canDoubleDown(hand)) {
+                    player.doubleDown(this, hand);
+                    setBet(hand, bets.get(hand) * 2);
+                } else {
+                    if(shouldHit(hand, dealerUpCard)) {
+                        player.hit(this, hand);
+                    } else {
+                        player.stand();
+                    }
+                }
+            } else if(shouldHit(hand, dealerUpCard)) {
+                player.hit(this, hand);
+            } else {
+                player.stand();
+            }
+        } else if(shouldDoubleDown(hand, dealerUpCard)) {
+            if(player.canDoubleDown(hand)) {
+                player.doubleDown(this, hand);
+                setBet(hand, bets.get(hand) * 2);
+            } else {
+                if(shouldHit(hand, dealerUpCard)) {
+                    player.hit(this, hand);
+                } else {
+                    player.stand();
+                }
+            }
+        } else if(shouldHit(hand, dealerUpCard)) {
+            player.hit(this, hand);
+        } else {
+            player.stand();
+        }
+    }
+
+    public boolean shouldHit(Hand hand, Card dealerUpCard) {
+        if(hand.softPairing(7)) {
+            return dealerUpCard.value() >= 9;
+        }
+
+        if(hand.softPairing(6)) {
+            return dealerUpCard.value() == 2 || dealerUpCard.value() >= 7;
+        }
+
+        if(hand.softPairing(5) || hand.softPairing(4)) {
+            return (dealerUpCard.value() == 2 || dealerUpCard.value() == 3) || dealerUpCard.value() >= 7;
+        }
+
+        if(hand.softPairing(3) || hand.softPairing(2)) {
+            return (dealerUpCard.value() >= 2 && dealerUpCard.value() <= 4) || dealerUpCard.value() >= 7;
+        }
+
+        if(hand.hardValue() >= 13 && hand.hardValue() <= 16) {
+            return dealerUpCard.value() >= 7;
+        }
+
+        if(hand.hardValue() == 12) {
+            return (dealerUpCard.value() == 2 || dealerUpCard.value() == 3) || dealerUpCard.value() >= 7;
+        }
+
+        if(hand.hardValue() == 10) {
+            return dealerUpCard.value() >= 10;
+        }
+
+        if(hand.hardValue() == 9) {
+            return dealerUpCard.value() == 2 || dealerUpCard.value() >= 7;
+        }
+
+        if(hand.hardValue() == 8) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * If a hand should be split
+     *
+     * @param hand The hand
+     * @param dealerUpCard The dealer's up facing card
+     * @return If the hand should be split
+     */
+    private boolean shouldSplitHand(Hand hand, Card dealerUpCard) {
+        if(hand.pairAces()) {
+            return true;
+        }
+
+        if(hand.pairValue(9)) {
+            return (dealerUpCard.value() >= 2 && dealerUpCard.value() <= 6) ||
+                    (dealerUpCard.value() == 8 || dealerUpCard.value() == 9);
+        }
+
+        if(hand.pairValue(8)) {
+            return true;
+        }
+
+        if(hand.pairValue(7) || hand.pairValue(3) || hand.pairValue(2)) {
+            return dealerUpCard.value() >= 2 && dealerUpCard.value() <= 7;
+        }
+
+        if(hand.pairValue(6)) {
+            return dealerUpCard.value() >= 2 && dealerUpCard.value() <= 6;
+        }
+
+        if(hand.pairValue(4)) {
+            return dealerUpCard.value() == 5 || dealerUpCard.value() == 6;
+        }
+
+        return false;
+    }
+
+    /**
+     * If a hand should be doubled down
+     *
+     * @param hand The hand
+     * @param dealerUpCard The dealer's up facing card
+     * @return If the hand should be doubled down
+     */
+    private boolean shouldDoubleDown(Hand hand, Card dealerUpCard) {
+        if(hand.softPairing(8)) {
+            return dealerUpCard.value() == 6;
+        }
+
+        if(hand.softPairing(7)) {
+            return dealerUpCard.value() >= 2 && dealerUpCard.value() <= 6;
+        }
+
+        if(hand.softPairing(6)) {
+            return dealerUpCard.value() >= 3 && dealerUpCard.value() <= 6;
+        }
+
+        if(hand.softPairing(5)) {
+            return dealerUpCard.value() >= 4 && dealerUpCard.value() <= 6;
+        }
+
+        if(hand.softPairing(4)) {
+            return dealerUpCard.value() >= 4 && dealerUpCard.value() <= 6;
+        }
+
+        if(hand.softPairing(3) || hand.softPairing(2)) {
+            return dealerUpCard.value() == 3 || dealerUpCard.value() == 4;
+        }
+
+        if(hand.hardValue() == 11) {
+            return true;
+        }
+
+        if(hand.hardValue() == 10) {
+            return dealerUpCard.value() <= 9;
+        }
+
+        if(hand.hardValue() == 9) {
+            return dealerUpCard.value() >= 3 && dealerUpCard.value() <= 6;
+        }
+
+        return false;
     }
 
     /**

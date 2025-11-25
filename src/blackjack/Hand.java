@@ -100,6 +100,26 @@ public class Hand {
     }
 
     /**
+     * Returns the hand's value ounting aces as 1
+     *
+     * @return The hand's value ounting aces as 1
+     */
+    public int hardValue() {
+        int val = 0;
+
+        for(Card card : cards) {
+            if(card.getName().equals("A")) {
+                val += 1;
+                continue;
+            }
+
+            val += card.value();
+        }
+
+        return val;
+    }
+
+    /**
      * Determines if the hand can be split
      * <p>
      * The hand can only be split if the hand has two cards of
@@ -119,6 +139,78 @@ public class Hand {
 
             return cards.get(0).valueEqual(cards.get(1)) &&
                     cards.get(0).getName().equals(cards.get(1).getName());
+        }
+
+        return false;
+    }
+
+    /**
+     * If the hand is a pair of aces
+     *
+     * @return If the hand is a pair of aces
+     */
+    public boolean pairAces() {
+        if(cards.size() != 2) {
+            return false;
+        }
+
+        return cards.get(0).getName().equals("A") && cards.get(1).getName().equals("A");
+    }
+
+    /**
+     * If the hand is a pair of value x
+     *
+     * @param x The value
+     * @return If the hand is a pair of value x
+     */
+    public boolean pairValue(int x) {
+        if(cards.size() != 2) {
+            return false;
+        }
+
+        return cards.get(0).value() == x && cards.get(1).value() == x;
+    }
+
+    /**
+     * If the hand has an ace and a card of value x
+     *
+     * @param x The value of the other card
+     * @return If the hand has an ace and a card of value x
+     */
+    public boolean softPairing(int x) {
+        if(cards.size() != 2) {
+            return false;
+        }
+
+        return hasAce() && (cards.get(0).value() == x || cards.get(1).value() == x);
+    }
+
+    /**
+     * If this hand has an ace
+     *
+     * @return If this hand has an ace
+     */
+    public boolean hasAce() {
+        for(Card card : cards) {
+            if(card.getName().equals("A")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * If this hand has a face card
+     *
+     * @return If this hand has a face card
+     */
+    public boolean hasFaceCard() {
+        for(Card card : cards) {
+            if(card.getName().equals("J") || card.getName().equals("Q")
+                    || card.getName().equals("K")) {
+                return true;
+            }
         }
 
         return false;

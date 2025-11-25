@@ -267,25 +267,15 @@ public class Player {
         return builder.toString();
     }
 
-    /**
-     * If the player should split a hand
-     *
-     * @param hand The hand
-     * @return If the player should split hand
-     */
-    public boolean shouldSplitHand(Hand hand) {
-        return hand.getCard(0).getName().equals("A") || (hand.getCard(0).value() >= 8 && hand.getCard(0).value() <= 10);
+    private boolean firstHandHasFaceCard() {
+        return getFirstHand().hasFaceCard();
     }
 
-    private boolean hasFaceCard() {
-        return getFirstHand().getCard(0).isFaceCard() || getFirstHand().getCard(1).isFaceCard();
-    }
-
-    private boolean hasAce() {
-        return getFirstHand().getCard(0).getName().equals("A") || getFirstHand().getCard(1).getName().equals("A");
+    private boolean firstHandHasAce() {
+        return getFirstHand().hasAce();
     }
 
     public boolean hasBlackjack() {
-        return hasAce() && hasFaceCard() && getFirstHand().getCards().size() == 2 && getHands().size() == 1;
+        return firstHandHasAce() && firstHandHasFaceCard() && getFirstHand().getCards().size() == 2 && getHands().size() == 1;
     }
 }
