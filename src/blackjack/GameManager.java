@@ -19,7 +19,7 @@ public class GameManager {
     private final double MAX_INITIAL_BET = 1500.00;
 
     private final int MAX_HANDS = 4;
-    private final int CUT_POINT = 52;
+    private final int CUT_POINT = 26;
 
     public GameManager(Game game) {
         this.deck = new Deck();
