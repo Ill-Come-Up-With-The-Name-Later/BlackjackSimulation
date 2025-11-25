@@ -244,7 +244,7 @@ public class Player {
     }
 
     public boolean canDoubleDown(Hand hand) {
-        return !hand.isDoubledDown();
+        return !hand.isDoubledDown() && hand.getCards().size() == 2;
     }
 
     @Override
