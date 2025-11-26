@@ -321,11 +321,11 @@ public class GameManager {
         Card dealerUpCard = dealer.getFirstHand().getCard(0);
 
         if(shouldSplitHand(hand, dealerUpCard)) {
-            if(hand.canSplit()) {
+            if(hand.canSplit() && player.getMoney() >= bets.get(hand)) {
                 Hand split = player.splitHand(hand);
                 setBet(split, bets.get(hand));
             } else if(shouldDoubleDown(hand, dealerUpCard)) {
-                if(player.canDoubleDown(hand)) {
+                if(player.canDoubleDown(hand) && player.getMoney() >= bets.get(hand) * 2) {
                     player.doubleDown(this, hand);
                     setBet(hand, bets.get(hand) * 2);
                 } else {
@@ -341,7 +341,7 @@ public class GameManager {
                 player.stand();
             }
         } else if(shouldDoubleDown(hand, dealerUpCard)) {
-            if(player.canDoubleDown(hand)) {
+            if(player.canDoubleDown(hand) && player.getMoney() >= bets.get(hand) * 2) {
                 player.doubleDown(this, hand);
                 setBet(hand, bets.get(hand) * 2);
             } else {
@@ -392,6 +392,10 @@ public class GameManager {
         }
 
         if(hand.hardValue() == 8) {
+            return true;
+        }
+
+        if(hand.hardValue() <= 7) {
             return true;
         }
 
