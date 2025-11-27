@@ -399,7 +399,7 @@ public class GameManager {
             return true;
         }
 
-        return false;
+        return hand.value() < 17;
     }
 
     /**
