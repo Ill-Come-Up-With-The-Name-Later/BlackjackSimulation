@@ -383,12 +383,16 @@ public class GameManager {
             return (dealerUpCard.value() == 2 || dealerUpCard.value() == 3) || dealerUpCard.value() >= 7;
         }
 
+        if(hand.hardValue() == 11) {
+            return true;
+        }
+
         if(hand.hardValue() == 10) {
-            return dealerUpCard.value() >= 10;
+            return dealerUpCard.value() < 10;
         }
 
         if(hand.hardValue() == 9) {
-            return dealerUpCard.value() == 2 || dealerUpCard.value() >= 7;
+            return true;
         }
 
         if(hand.hardValue() == 8) {
