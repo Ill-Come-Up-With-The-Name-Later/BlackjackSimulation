@@ -59,24 +59,14 @@ public class Deck {
      * Shuffles the deck
      */
     public void shuffle() {
-        int swaps = new Random().nextInt(cards.size() * 5, cards.size() * 10);
+        for(int i = cards.size() - 1; i >= 1; i--) {
+            int j = new Random().nextInt(0, i + 1);
 
-        for(int i = 0; i < swaps; i++) {
-            int card1Index = new Random().nextInt(0, cards.size());
-            int card2Index = new Random().nextInt(0, cards.size());
+            Card card = cards.get(i);
+            Card card2 = cards.get(j);
 
-            while(card1Index == card2Index) {
-                card2Index = new Random().nextInt(0, cards.size());
-            }
-
-            Card card1 = cards.get(card1Index);
-            Card card2 = cards.get(card2Index);
-
-            cards.remove(card1);
-            cards.remove(card2);
-
-            cards.add(Math.max(cards.size() - 1, Math.max(card2Index - 1, 0)), card1);
-            cards.add(Math.max(cards.size() - 1, Math.max(card1Index - 1, 0)), card2);
+            cards.set(i, card2);
+            cards.set(j, card);
         }
     }
 

@@ -320,6 +320,11 @@ public class GameManager {
     private void basicStrategy(Player player, Hand hand) {
         Card dealerUpCard = dealer.getFirstHand().getCard(0);
 
+        if(player.hasBlackjack() || hand.value() == 21) {
+            player.stand();
+            return;
+        }
+
         if(shouldSplitHand(hand, dealerUpCard)) {
             if(hand.canSplit() && player.getMoney() >= bets.get(hand)) {
                 Hand split = player.splitHand(hand);
