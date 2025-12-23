@@ -1,14 +1,14 @@
 package blackjack;
 
-import java.util.ArrayList;
 import java.util.Random;
+import java.util.Stack;
 
 public class Deck {
 
-    public ArrayList<Card> cards;
+    public Stack<Card> cards;
 
     public Deck() {
-        this.cards = new ArrayList<>();
+        this.cards = new Stack<>();
     }
 
     /**
@@ -48,7 +48,7 @@ public class Deck {
     }
 
     public void addCard(Card card) {
-        this.cards.add(card);
+        this.cards.push(card);
     }
 
     public void removeCard(Card card) {
@@ -70,7 +70,7 @@ public class Deck {
         }
     }
 
-    public ArrayList<Card> getCards() {
+    public Stack<Card> getCards() {
         return cards;
     }
 
@@ -80,10 +80,7 @@ public class Deck {
      * @return The card at the top of the deck
      */
     public Card drawCard() {
-        Card card = cards.getFirst();
-        cards.removeFirst();
-
-        return card;
+        return cards.pop();
     }
 
     /**
