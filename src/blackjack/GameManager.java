@@ -624,6 +624,11 @@ public class GameManager {
         return true;
     }
 
+    /**
+     * If all players have a blackjack
+     *
+     * @return If all players have a blackjack
+     */
     public boolean allPlayersBlackjack() {
         for(Player player : game.getPlayers()) {
             if(!player.hasBlackjack()) {

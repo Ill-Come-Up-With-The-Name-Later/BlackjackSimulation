@@ -70,10 +70,6 @@ public class Deck {
         }
     }
 
-    public Stack<Card> getCards() {
-        return cards;
-    }
-
     /**
      * Draws a card from the top of the deck
      *
