@@ -677,8 +677,8 @@ public class GameManager {
         drawnCards.add(card);
 
         if(card.value() < 7) {
-            runningCount += 1;
-        } else if(card.value() >= 10) {
+            runningCount = 1;
+        } else if(card.value() >= 10 || card.getName().equals("A")) {
             runningCount -= 1;
         }
 
