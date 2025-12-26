@@ -100,9 +100,9 @@ public class Hand {
     }
 
     /**
-     * Returns the hand's value ounting aces as 1
+     * Returns the hand's value counting aces as 1
      *
-     * @return The hand's value ounting aces as 1
+     * @return The hand's value counting aces as 1
      */
     public int hardValue() {
         int val = 0;

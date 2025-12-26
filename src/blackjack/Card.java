@@ -1,5 +1,7 @@
 package blackjack;
 
+import java.util.Objects;
+
 public class Card implements Comparable<Card> {
 
     private String name;
@@ -102,5 +104,16 @@ public class Card implements Comparable<Card> {
             case "A" -> this.name.equals("A");
             default -> false;
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Card card)) return false;
+        return isShow() == card.isShow() && Objects.equals(getName(), card.getName()) && getSuit() == card.getSuit();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getSuit(), isShow());
     }
 }
